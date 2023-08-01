@@ -1,0 +1,6 @@
+global:
+  application_name: $APP_NAME
+  workspace_type: Application
+  default_platform: Node.js 16 running on 64bit Amazon Linux 2
+deploy:
+  artifact: Archive.zip

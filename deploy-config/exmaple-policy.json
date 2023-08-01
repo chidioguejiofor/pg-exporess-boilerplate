@@ -1,0 +1,105 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "elasticbeanstalk:UpdateApplicationVersion"            ],
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "elasticbeanstalk:InApplication": [
+                        "arn:aws:elasticbeanstalk:[aws-region]:[account-id]:application/[app-name]"
+                    ]
+                }
+            }
+        },
+        {
+            "Effect":"Allow",
+            "Action":[
+                "elasticbeanstalk:UpdateEnvironment"
+            ],
+            "Resource":"arn:aws:elasticbeanstalk:[aws-region]:[account-id]:environment/[app-name]/*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "elasticbeanstalk:CreateApplicationVersion"
+            ],
+            "Resource": "arn:aws:elasticbeanstalk:[aws-region]:[account-id]:applicationversion/[app-name]/*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "elasticbeanstalk:DescribeEvents",
+                "elasticbeanstalk:DescribeApplications",
+                "elasticbeanstalk:AddTags",
+                "elasticbeanstalk:ListPlatformVersions",
+                "elasticbeanstalk:DescribeAccountAttributes",
+                "elasticbeanstalk:AbortEnvironmentUpdate",
+                "elasticbeanstalk:TerminateEnvironment",
+                "elasticbeanstalk:ValidateConfigurationSettings",
+                "elasticbeanstalk:CheckDNSAvailability",
+                "elasticbeanstalk:RequestEnvironmentInfo",
+                "elasticbeanstalk:RebuildEnvironment",
+                "elasticbeanstalk:DescribeInstancesHealth",
+                "elasticbeanstalk:DescribeEnvironmentHealth",
+                "elasticbeanstalk:RestartAppServer",
+                "elasticbeanstalk:DescribeEnvironmentManagedActions",
+                "elasticbeanstalk:SwapEnvironmentCNAMEs",
+                "elasticbeanstalk:DescribeConfigurationOptions",
+                "elasticbeanstalk:ApplyEnvironmentManagedAction",
+                "elasticbeanstalk:CreateEnvironment",
+                "elasticbeanstalk:DeleteEnvironmentConfiguration"            ],
+            "Resource": [
+                "arn:aws:elasticbeanstalk:[aws-region]:[account-id]:application/[app-name]"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:*",
+                "s3:*",
+                "autoscaling:*",
+                "elasticbeanstalk:RetrieveEnvironmentInfo",
+                "elasticbeanstalk:ListPlatformBranches",
+                "elasticbeanstalk:DescribeConfigurationSettings",
+                "elasticbeanstalk:CreateStorageLocation",
+                "elasticbeanstalk:Describe*",
+                "elasticbeanstalk:ListPlatformBranches",
+                "elasticbeanstalk:DescribePlatformVersion"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect":"Allow",
+            "Action":[
+                "cloudformation:*"
+            ],
+            "Resource": [
+                "arn:aws:cloudformation:[aws-region]:[account-id]:*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "elasticbeanstalk:Describe*"
+            ],
+            "Resource": [
+                "arn:aws:elasticbeanstalk:*::platform/*",
+                "arn:aws:elasticbeanstalk:*:*:environment/*/*",
+                "arn:aws:elasticbeanstalk:*:*:application/*",
+                "arn:aws:elasticbeanstalk:*::solutionstack/*",
+                "arn:aws:elasticbeanstalk:*:*:applicationversion/*/*",
+                "arn:aws:elasticbeanstalk:*:*:configurationtemplate/*/*"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "elasticbeanstalk:InApplication": [
+                        "arn:aws:elasticbeanstalk:[aws-region]:[account-id]:application/[app-name]"
+                    ]
+                }
+            }
+        }
+    ]
+}

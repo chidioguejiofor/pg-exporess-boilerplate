@@ -1,0 +1,1 @@
+export { SampleRepositoryType } from "./repositories";

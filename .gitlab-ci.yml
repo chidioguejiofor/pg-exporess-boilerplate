@@ -1,0 +1,116 @@
+image: nikolaik/python-nodejs:python3.7-nodejs14
+
+
+cache:
+  key: node_modules_cache
+  paths:
+    - node_modules/
+    - apt-cache/
+
+stages:
+  - build
+  - test
+  - deploy
+
+
+
+install dependencies:
+  stage: build
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - node_modules/
+  script:
+    - npm ci
+    - echo "Installation complete."
+
+run unit test:
+  stage: test
+  script:
+    - npm run test:unit
+  dependencies:
+    - install dependencies
+  except:
+    - /release-*/
+    - develop
+
+run integration tests:
+  stage: test
+  services:
+    - postgres:13.3
+  variables:
+    POSTGRES_HOST: postgres
+    POSTGRES_DB: pii_shop
+    POSTGRES_USER: pii_shop
+    POSTGRES_PASSWORD: testing
+    # app env
+    TEST_PG_NAME: pii_shop
+    TEST_PG_USER: pii_shop
+    TEST_PG_PASSWORD: testing
+    TEST_PG_HOST: postgres
+  script:
+    - echo "$TEST_PG_NAME"
+    - npm run test:integration
+  dependencies:
+    - install dependencies
+  except:
+    - /release-*/
+    - develop
+
+check lint:
+  stage: test
+  script:
+    - npm run check-lint
+  dependencies:
+    - install dependencies
+  except:
+    - /release-*/
+    - develop
+
+check typescript:
+  stage: test
+  script:
+    - npm run build
+  dependencies:
+    - install dependencies
+  except:
+    - /release-*/
+    - develop
+
+.aws-ebs:
+  services:
+    - registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  before_script:
+    - apt-get update
+    - apt-get upgrade -y
+    - apt-get install -o dir::cache::archives="apt-cache"  zip -y
+    - git clone https://github.com/aws/aws-elastic-beanstalk-cli-setup.git
+    - python aws-elastic-beanstalk-cli-setup/scripts/ebcli_installer.py --version=3.20.2
+    - echo 'export PATH="/root/.ebcli-virtual-env/executables:$PATH"' >> ~/.bash_profile && source ~/.bash_profile
+  script:
+    - npm run build-ebs
+    - mkdir -p .elasticbeanstalk
+    - npm run set-ebs-appname $EB_APP_NAME
+    - eb deploy $AWS_EBS_ENV_NAME  --region $AWS_DEFAULT_REGION  --staged
+  dependencies:
+    - install dependencies
+
+
+deploy to staging:
+  extends: .aws-ebs
+  stage: deploy
+  variables:
+    AWS_EBS_ENV_NAME: $STAGING_ENV_NAME
+  only:
+    - develop
+    - fix-make-deployment-to-work
+  
+  
+deploy to production:
+  extends: .aws-ebs
+  stage: deploy
+  variables:
+    AWS_EBS_ENV_NAME: $PRODUCTION_ENV_NAME
+  only:
+    - /release-*/
+  when: manual
